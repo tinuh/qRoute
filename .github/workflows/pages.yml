@@ -28,6 +28,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - run: cd client
       - name: Checkout
         uses: actions/checkout@v3
       - name: Detect package manager
