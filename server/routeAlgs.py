@@ -1,6 +1,7 @@
+from networkx import DiGraph
+from vrpy import VehicleRoutingProblem
 import random
 import math
-
 
 
 def makeTestGraph(n,m,M):
@@ -296,6 +297,20 @@ def greedyFlexibleTurnPriority(graph,n,maxGap):
                 nextDistance[i] = graph[paths[i][len(paths[i])-1]][nextNode[i]]
     return paths, distances
 
+def vrpyRouteV1(graph,n,maxGap = 0):
+    G = DiGraph()
+    for i in range(1,len(graph)):
+        G.add_edge("Source", i, cost=graph[i][0])
+        for j in range(1, len(graph[i])):
+            G.add_edge(i, j, cost=graph[i][j])       
+        G.add_edge(i, "Sink", cost=0)
+    prob = VehicleRoutingProblem(G)
+    prob.num_vehicles = n
+    prob.num_stops = math.ceil(len(graph)/n) + maxGap
+    prob.solve(greedy = True)
+    return prob.best_routes,prob.best_value
+
+
 
 def displayPaths(p,d):
     for i in range(len(p)):
@@ -304,30 +319,39 @@ def displayPaths(p,d):
 
 bestCount = [0,0,0,0,0,0,0,0]
 for i in range(1):
-    t = makeTestGraph(1000,1,100)
+    t = makeTestGraph(100,1,100)
 
     #p,d = greedyTurn(t,5)
     #p2,d2 = greedyNeedy(t,5)
     #p3,d3 = greedyNeedyChain(t,5,10)
-    p4,d4 = greedyPriority(t,10)
+    #p4,d4 = greedyPriority(t,3)
     p5,d5 = greedyTurnPriority(t,10)
-    p6,d6 = greedyFlexibleTurnPriority(t,10,5)
+    p6,d6 = greedyFlexibleTurnPriority(t,10,2)
     #p7,d7 = greedyFlexibleTurnPriority(t,10,9)
     #p8,d8 = greedyFlexibleTurnPriority(t,10,15)
     #p9,d9 = greedyFlexibleTurnPriority(t,10,20)
 
+    print("vrpy time!")
+
+    v1,vd1 = vrpyRouteV1(t,5,2) 
+
     #displayPaths(p,d)
     #displayPaths(p2,d2)
     #displayPaths(p3,d3)
-    displayPaths(p4,d4)
-    displayPaths(p5,d5)
-    displayPaths(p6,d6)
+    #displayPaths(p4,d4)
+    #displayPaths(p5,d5)
+    #displayPaths(p6,d6)
+    print(v1)
+    print(vd1)
 
     #dists = [sum(d),sum(d2),sum(d3),sum(d4),sum(d5),sum(d6),sum(d7),sum(d8)]
-    dists = [sum(d4),sum(d5),sum(d6)]
+    dists = [sum(d5),sum(d6)]
+    paths = [p5,p6]
     #print(firstMinIndex(dists),dists)
     #print(min(dists))
     bestCount[firstMinIndex(dists)] += 1
-print(bestCount)
+    print(bestCount)
+    print(paths[firstMinIndex(dists)])
+    print(min(dists))
     #print(d)
     
