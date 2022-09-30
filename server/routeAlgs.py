@@ -298,6 +298,13 @@ def greedyFlexibleTurnPriority(graph,n,maxGap):
     return paths, distances
 
 def vrpyRouteV1(graph,n,maxGap = 0):
+    """
+    Uses vrpy routing problem algorithm to find the lowest distance route with n routes and a maximum stop gap between routes of maxGap
+
+    graph: weighted graph
+    n: number of paths to take
+    maxGap: amount bigger one path is allowed to go from another
+    """
     G = DiGraph()
     for i in range(1,len(graph)):
         G.add_edge("Source", i, cost=graph[i][0])
