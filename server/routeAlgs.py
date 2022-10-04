@@ -326,21 +326,24 @@ def displayPaths(p,d):
 
 bestCount = [0,0,0,0,0,0,0,0]
 for i in range(1):
-    t = makeTestGraph(100,1,100)
 
-    #p,d = greedyTurn(t,5)
-    #p2,d2 = greedyNeedy(t,5)
-    #p3,d3 = greedyNeedyChain(t,5,10)
-    #p4,d4 = greedyPriority(t,3)
-    p5,d5 = greedyTurnPriority(t,10)
-    p6,d6 = greedyFlexibleTurnPriority(t,10,2)
-    #p7,d7 = greedyFlexibleTurnPriority(t,10,9)
-    #p8,d8 = greedyFlexibleTurnPriority(t,10,15)
-    #p9,d9 = greedyFlexibleTurnPriority(t,10,20)
+    stopCount = int(input("number of stops: "))
+    routeNum = int(input("number of busses: "))
+    
+    t = makeTestGraph(stopCount,1,100)
 
-    print("vrpy time!")
+    #p,d = greedyTurn(t,routeNum)
+    #p2,d2 = greedyNeedy(t,routeNum)
+    #p3,d3 = greedyNeedyChain(t,routeNum,10)
+    #p4,d4 = greedyPriority(t,routeNum)
+    p5,d5 = greedyTurnPriority(t,routeNum)
+    p6,d6 = greedyFlexibleTurnPriority(t,routeNum,1)
+    #p7,d7 = greedyFlexibleTurnPriority(t,routeNum,9)
+    #p8,d8 = greedyFlexibleTurnPriority(t,routeNum,15)
+    #p9,d9 = greedyFlexibleTurnPriority(t,routeNum,20)
 
-    v1,vd1 = vrpyRouteV1(t,5,2) 
+
+    v1,vd1 = vrpyRouteV1(t,routeNum,1) 
 
     #displayPaths(p,d)
     #displayPaths(p2,d2)
