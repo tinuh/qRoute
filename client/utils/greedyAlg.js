@@ -1,10 +1,10 @@
 function closestOpenNode(graph, n, openNodes) {
 	let c = -1;
-	for (i of openNodes) {
+	Object.keys(openNodes).forEach((i) => {
 		if ((graph[n][i] < graph[n][c] || c === -1) && i != n) {
 			c = i;
 		}
-	}
+	});
 	return c;
 }
 
@@ -18,14 +18,26 @@ function firstMinIndex(arr) {
 	return index;
 }
 
-function greedyAlgorithm(graph, n, maxGap) {
+export function greedyAlgorithm(coordinates, n, maxGap) {
+	let graph = [];
+	for (let i = 0; i < coordinates.length; i++) {
+		graph.push([]);
+		for (let x = 0; x < coordinates.length; x++) {
+			graph[i].push(
+				(coordinates[i][0] - coordinates[x][0]) ** 2 +
+					(coordinates[i][1] - coordinates[x][1]) ** 2
+			);
+		}
+	}
+	//console.log(graph);
+
 	let paths = [];
 	let distances = [];
 	let nextDistance = [];
 	let nextNode = [];
 	let openNodes = {};
 	for (let i = 0; i < graph.length; i++) {
-		openNodes[i] = True;
+		openNodes[i] = true;
 	}
 	delete openNodes[0];
 	for (let i = 0; i < n; i++) {
@@ -35,12 +47,13 @@ function greedyAlgorithm(graph, n, maxGap) {
 		nextDistance.push(graph[0][nextNode[i]]);
 	}
 	let node = 0;
-	console.log("open: " + openNodes);
-	while (openNodes.length > 0) {
+	console.log(openNodes);
+	while (Object.keys(openNodes).length > 0) {
+		console.log("hi");
 		let minLength = -1;
 		for (let i = 0; i < n; i++) {
 			if (minLength === -1 || paths[i].length < minLength) {
-				minLength = len(paths[i]);
+				minLength = paths[i].length;
 			}
 		}
 		let nextPathDists = {};
@@ -50,12 +63,12 @@ function greedyAlgorithm(graph, n, maxGap) {
 			}
 		}
 		node = -1;
-		for (i of nextPathDists) {
+		Object.keys(nextPathDists).forEach((i) => {
 			if (node === -1 || nextPathDists[i] < nextPathDists[node]) {
 				node = i;
 			}
-		}
-		let last = paths[node][len(paths[node]) - 1];
+		});
+		let last = paths[node][paths[node].length - 1];
 		paths[node].push(nextNode[node]);
 		distances[node] += graph[last][nextNode[node]];
 		delete openNodes[nextNode[node]];
@@ -64,10 +77,11 @@ function greedyAlgorithm(graph, n, maxGap) {
 			if (nextNode[i] === dest) {
 				nextNode[i] = closestOpenNode(
 					graph,
-					paths[i][len(paths[i]) - 1],
+					paths[i][paths[i].length - 1],
 					openNodes
 				);
-				nextDistance[i] = graph[paths[i][len(paths[i]) - 1]][nextNode[i]];
+				console.log(nextNode[i]);
+				nextDistance[i] = graph[paths[i][paths[i].length - 1]][nextNode[i]];
 			}
 		}
 	}
