@@ -1,3 +1,24 @@
+function closestOpenNode(graph,n,openNodes){
+    let c = -1
+    for (i of openNodes){
+        if ((graph[n][i] < graph[n][c] || c === -1) && i != n){
+            c = i
+        }
+}
+return c
+}
+
+
+function firstMinIndex(arr){
+    let index = -1
+    for (let i = 0; i<arr.length;i++){
+        if (index == -1 || arr[i] < arr[index]){
+            index = i
+        }
+    }
+    return index
+}
+
 function greedyAlgorithm(graph, n, maxGap){
 
     let paths = []
