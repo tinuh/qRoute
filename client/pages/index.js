@@ -63,9 +63,8 @@ export default function Home() {
 		console.log(res);
 		let linesTemp = [];
 		res[0].forEach((path) => {
-			path.slice(0, -1).forEach((line, i) => {
-				linesTemp.push([stops[path[i]].coords, stops[path[i + 1]].coords]);
-				//return [stops[path[i]].coords, stops[path[i + 1]].coords];
+			path.forEach((line, i) => {
+				linesTemp.push(stops[path[i]].coords);
 			});
 		});
 		console.log(linesTemp);
@@ -240,9 +239,7 @@ export default function Home() {
 						/>
 					))}
 
-					{lines.map((line, i) => (
-						<Line key={i} coordsArray={[...line]} />
-					))}
+					<Line coordsArray={lines} />
 				</Map>
 			</div>
 		</div>
