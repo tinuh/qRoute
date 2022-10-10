@@ -1,9 +1,32 @@
 // https://github.com/radarlabs/radar-sdk-js
 // https://radar.com/documentation/sdk/web
 
-API_KEY = "prj_test_pk_782c752373db12dbd94e9a8de91a108f249a6ab6"
+function createDistanceMatrix (originsArr, destinationsArr) {
+	API_KEY = "prj_test_pk_782c752373db12dbd94e9a8de91a108f249a6ab6"
 
-Radar.initialize(API_KEY);
+	var matrix = [];
+
+	Radar.initialize(API_KEY);
+	
+	Radar.getMatrix({
+	  origins: originsArr,
+	  destinations: destinationsArr,
+	  modes: 'car',
+	  units: 'imperial'
+	}, function(err, result) {
+	  if (!err) {
+	    // do something with result.matrix
+		radarMatrix = result.matrix;
+		for (let i=0; i < radarMatrix.length; i++) {
+			matrix.push([]);
+			for (let j=0; j < radarMatrix[i].length; j++) {
+				matrix[matrix.length - 1].push(radarMatrix[i][j].duration.value);
+			}
+		}
+	  }
+	});
+  return matrix;
+}
 
 originsArr = [{
     latitude: 39.0185856,
@@ -39,24 +62,4 @@ destinationsArr = [{
     longitude:-76.9364229
   }];
 
-Radar.getMatrix({
-  origins: originsArr,
-  destinations: destinationsArr,
-  modes: 'car',
-  units: 'imperial'
-}, function(err, result) {
-  if (!err) {
-    // do something with result.matrix
-	radarMatrix = result.matrix;
-	var matrix = [];
-	
-	for (let i=0; i < radarMatrix.length; i++) {
-	   matrix.push([]);
-    	for (let j=0; j < radarMatrix[i].length; j++) {
-			matrix[matrix.length - 1].push(radarMatrix[i][j].duration.value);
-	  	}
-	}
-	console.log(matrix);
-	  
-  }
-});
+console.log(createDistanceMatrix(originsArr, destinationsArr));
