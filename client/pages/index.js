@@ -2,43 +2,52 @@ import React, { useState } from "react";
 import { Map, Marker } from "pigeon-maps";
 import axios from "axios";
 //import { stamenToner } from 'pigeon-maps/providers'
+import { greedyAlgorithm } from "../utils/greedyAlg";
+import Line from "../components/Line";
 
 export default function Home() {
 	const [address, setAddress] = useState("");
 	const [drop, setDrop] = useState(false);
 	const [dropSelection, setDropSelection] = useState("");
 	const [loading, setLoading] = useState(false);
-
-	const [paths, setPaths] = useState([
+	const [stops, setStops] = useState([
 		{
-			color: "#c92e39",
-			route: "6999",
-			anchors: [
-				{
-					address: "Montgomery Blair HS",
-					coords: [39.018, -77.012],
-				},
-				{
-					address: "Marilyn J. Praisner Community Library",
-					coords: [39.102, -76.94],
-				},
-			],
-		},
-		{
-			color: "teal",
-			route: "4991",
-			anchors: [
-				{
-					address: "Montgomery Blair HS",
-					coords: [39.018, -77.012],
-				},
-				{
-					address: "Travilah ES",
-					coords: [39.082, -77.247],
-				},
-			],
+			address: "Montgomery Blair HS",
+			coords: [39.018, -77.012],
 		},
 	]);
+	const [lines, setLines] = useState([]);
+
+	// const [paths, setPaths] = useState([
+	// 	{
+	// 		color: "#c92e39",
+	// 		route: "6999",
+	// 		anchors: [
+	// 			{
+	// 				address: "Montgomery Blair HS",
+	// 				coords: [39.018, -77.012],
+	// 			},
+	// 			{
+	// 				address: "Marilyn J. Praisner Community Library",
+	// 				coords: [39.102, -76.94],
+	// 			},
+	// 		],
+	// 	},
+	// 	{
+	// 		color: "teal",
+	// 		route: "4991",
+	// 		anchors: [
+	// 			{
+	// 				address: "Montgomery Blair HS",
+	// 				coords: [39.018, -77.012],
+	// 			},
+	// 			{
+	// 				address: "Travilah ES",
+	// 				coords: [39.082, -77.247],
+	// 			},
+	// 		],
+	// 	},
+	// ]);
 
 	const updateAddress = (e) => {
 		setAddress(e.target.value);
@@ -57,12 +66,18 @@ export default function Home() {
 			.get("http://api.positionstack.com/v1/forward", { params })
 			.then((res) => {
 				console.log(res.data);
-				let temp = paths;
-				temp[0].anchors.push({
+				let temp = stops;
+				temp.push({
 					address: address,
 					coords: [res.data.data[0].latitude, res.data.data[0].longitude],
 				});
-				setPaths(temp);
+				setStops(temp);
+				// let temp = paths;
+				// temp[0].anchors.push({
+				// 	address: address,
+				// 	coords: [res.data.data[0].latitude, res.data.data[0].longitude],
+				// });
+				// setPaths(temp);
 				setAddress("");
 			})
 			.catch((error) => {
@@ -71,8 +86,21 @@ export default function Home() {
 			});
 	};
 
+	const doIt = () => {
+		let temp = stops.map(({ coords }) => {
+			return coords;
+		});
+		let lines = greedyAlgorithm(temp, 2, 0);
+		console.log(lines);
+		setLines(lines[0]);
+	};
+
 	return (
 		<div className="text-center mx-20">
+			<img
+				className="absolute z-50 w-16"
+				src="https://i.gifer.com/origin/5a/5ab33aabd7ff03f9bf4678b91a07afac_w200.gif"
+			/>
 			<img className="h-20 mt-5 m-auto" src="/logo.svg" alt="qroute logo" />
 
 			<div className="my-5 inline-flex gap-4 w-full">
@@ -136,6 +164,7 @@ export default function Home() {
 						placeholder="Address"
 						type="text"
 						id="address"
+						onSubmit={add}
 					/>
 
 					<button
@@ -159,9 +188,36 @@ export default function Home() {
 						</svg>
 					</button>
 				</div>
+				<a
+					className="group relative inline-flex items-center overflow-hidden rounded px-8 py-3 focus:outline-none focus:ring active:bg-yellow-600"
+					onClick={() => doIt()}
+					href="#"
+					style={{ backgroundColor: "#ffde59" }}
+				>
+					<span className="absolute left-0 -translate-x-full transition-transform group-hover:translate-x-4">
+						<svg
+							className="h-5 w-5"
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M17 8l4 4m0 0l-4 4m4-4H3"
+							/>
+						</svg>
+					</span>
+
+					<span className="text-sm font-medium transition-all group-hover:ml-4">
+						Do it
+					</span>
+				</a>
 			</div>
-			
-			{paths.map(({ anchors, route }) => (
+
+			{/* {paths.map(({ anchors, route }) => (
 				<div className="text-left" key={route}>
 					<p className="font-bold">{route}</p>
 					<ul className="text-left">
@@ -170,7 +226,15 @@ export default function Home() {
 						))}
 					</ul>
 				</div>
-			))}
+			))} */}
+
+			<div className="text-left">
+				<ul className="text-left">
+					{stops.map(({ address, coords }, i) => (
+						<li key={i}>{address}</li>
+					))}
+				</ul>
+			</div>
 
 			<div className="mt-5">
 				<Map
@@ -179,7 +243,7 @@ export default function Home() {
 					defaultCenter={[39.018, -77.012]}
 					defaultZoom={11}
 				>
-					{paths.map(({ color, anchors }) =>
+					{/* {paths.map(({ color, anchors }) =>
 						anchors.map((point, key) => (
 							<Marker
 								key={key}
@@ -188,7 +252,17 @@ export default function Home() {
 								color={color}
 							/>
 						))
-					)}
+					)} */}
+					{stops.map(({ address, coords }, i) => (
+						<Marker
+							key={i}
+							width={40}
+							anchor={coords}
+							color={"red"}
+							onClick={() => alert(address)}
+						/>
+					))}
+					<Line coordsArray={([39.018, -77.012], [39.082, -77.247])} />
 				</Map>
 			</div>
 		</div>
