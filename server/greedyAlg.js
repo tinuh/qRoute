@@ -1,75 +1,72 @@
-function closestOpenNode(graph, n, openNodes) {
-	let c = -1;
-	for (i of openNodes) {
-		if ((graph[n][i] < graph[n][c] || c === -1) && i != n) {
-			c = i;
-		}
-	}
-	return c;
+function closestOpenNode(graph,n,openNodes){
+    let c = -1
+    for (i of openNodes){
+        if ((graph[n][i] < graph[n][c] || c === -1) && i != n){
+            c = i
+        }
+}
+return c
 }
 
-function firstMinIndex(arr) {
-	let index = -1;
-	for (let i = 0; i < arr.length; i++) {
-		if (index == -1 || arr[i] < arr[index]) {
-			index = i;
-		}
-	}
-	return index;
+
+function firstMinIndex(arr){
+    let index = -1
+    for (let i = 0; i<arr.length;i++){
+        if (index == -1 || arr[i] < arr[index]){
+            index = i
+        }
+    }
+    return index
 }
 
-function greedyAlgorithm(graph, n, maxGap) {
-	let paths = [];
-	let distances = [];
-	let nextDistance = [];
-	let nextNode = [];
-	let openNodes = {};
-	for (let i = 0; i < graph.length; i++) {
-		openNodes[i] = True;
-	}
-	delete openNodes[0];
-	for (let i = 0; i < n; i++) {
-		paths.push([0]);
-		distances.push(0);
-		nextNode.push(closestOpenNode(graph, 0, openNodes));
-		nextDistance.push(graph[0][nextNode[i]]);
-	}
-	let node = 0;
-	console.log("open: " + openNodes);
-	while (openNodes.length > 0) {
-		let minLength = -1;
-		for (let i = 0; i < n; i++) {
-			if (minLength === -1 || paths[i].length < minLength) {
-				minLength = len(paths[i]);
-			}
-		}
-		let nextPathDists = {};
-		for (let i = 0; i < n; i++) {
-			if (paths[i].length <= minLength + maxGap) {
-				nextPathDists[i] = nextDistance[i];
-			}
-		}
-		node = -1;
-		for (i of nextPathDists) {
-			if (node === -1 || nextPathDists[i] < nextPathDists[node]) {
-				node = i;
-			}
-		}
-		let last = paths[node][len(paths[node]) - 1];
-		paths[node].push(nextNode[node]);
-		distances[node] += graph[last][nextNode[node]];
-		delete openNodes[nextNode[node]];
-		let dest = nextNode[node];
-		for (let i = 0; i < n; i++) {
-			if (nextNode[i] === dest) {
-				nextNode[i] = closestOpenNode(
-					graph,
-					paths[i][len(paths[i]) - 1],
-					openNodes
-				);
-				nextDistance[i] = graph[paths[i][len(paths[i]) - 1]][nextNode[i]];
-			}
-		}
-	}
-	return [paths, distances];
+export function greedyAlgorithm(graph, n, maxGap){
+
+    let paths = []
+    let distances = []
+    let nextDistance = []
+    let nextNode = []
+    let openNodes = {}
+    for (let i = 0; i <  graph.length; i++){
+        openNodes[i] = true
+    }
+    delete openNodes[0];
+    for (let i = 0; i <  n; i++){
+        paths.push([0])
+        distances.push(0)
+        nextNode.push(closestOpenNode(graph,0,openNodes))
+        nextDistance.push(graph[0][nextNode[i]])  
+    }
+    let node = 0
+    while (openNodes.length > 0){
+        let minLength = -1
+        for (let i = 0; i <  n; i++){
+            if (minLength === -1 || paths[i].length < minLength){
+                minLength = len(paths[i])
+            }
+        }
+        let nextPathDists = {}
+        for (let i = 0; i <  n; i++){
+            if (paths[i].length <= minLength + maxGap){
+                nextPathDists[i] = nextDistance[i]
+            }
+        }
+        node = -1
+        for (i of nextPathDists){
+            if (node === -1 || nextPathDists[i] < nextPathDists[node]){
+                node = i
+            }
+        }
+        let last = paths[node][len(paths[node])-1]
+        paths[node].push(nextNode[node])
+        distances[node] += graph[last][nextNode[node]]
+        delete openNodes[nextNode[node]]
+        let dest = nextNode[node]
+        for (let i = 0; i <  n; i++){
+            if (nextNode[i] === dest){
+                nextNode[i] = closestOpenNode(graph,paths[i][len(paths[i])-1],openNodes)
+                nextDistance[i] = graph[paths[i][len(paths[i])-1]][nextNode[i]]
+            }   
+        }
+    }
+    return [paths, distances]
 }
