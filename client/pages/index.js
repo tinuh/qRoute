@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Map, Marker } from "pigeon-maps";
+import { Map, Marker, Overlay } from "pigeon-maps";
 import axios from "axios";
 //import { stamenToner } from 'pigeon-maps/providers'
 import { greedyAlgorithm } from "../utils/greedyAlg";
@@ -17,37 +17,6 @@ export default function Home() {
 		},
 	]);
 	const [lines, setLines] = useState([]);
-
-	// const [paths, setPaths] = useState([
-	// 	{
-	// 		color: "#c92e39",
-	// 		route: "6999",
-	// 		anchors: [
-	// 			{
-	// 				address: "Montgomery Blair HS",
-	// 				coords: [39.018, -77.012],
-	// 			},
-	// 			{
-	// 				address: "Marilyn J. Praisner Community Library",
-	// 				coords: [39.102, -76.94],
-	// 			},
-	// 		],
-	// 	},
-	// 	{
-	// 		color: "teal",
-	// 		route: "4991",
-	// 		anchors: [
-	// 			{
-	// 				address: "Montgomery Blair HS",
-	// 				coords: [39.018, -77.012],
-	// 			},
-	// 			{
-	// 				address: "Travilah ES",
-	// 				coords: [39.082, -77.247],
-	// 			},
-	// 		],
-	// 	},
-	// ]);
 
 	const updateAddress = (e) => {
 		setAddress(e.target.value);
@@ -90,9 +59,17 @@ export default function Home() {
 		let temp = stops.map(({ coords }) => {
 			return coords;
 		});
-		let lines = greedyAlgorithm(temp, 2, 0);
-		console.log(lines);
-		setLines(lines[0]);
+		let res = greedyAlgorithm(temp, 2, 0);
+		console.log(res);
+		let linesTemp = [];
+		res[0].forEach((path) => {
+			path.slice(0, -1).forEach((line, i) => {
+				linesTemp.push([stops[path[i]].coords, stops[path[i + 1]].coords]);
+				//return [stops[path[i]].coords, stops[path[i + 1]].coords];
+			});
+		});
+		console.log(linesTemp);
+		setLines(linesTemp);
 	};
 
 	return (
@@ -262,7 +239,10 @@ export default function Home() {
 							onClick={() => alert(address)}
 						/>
 					))}
-					<Line coordsArray={([39.018, -77.012], [39.082, -77.247])} />
+
+					{lines.map((line, i) => (
+						<Line key={i} coordsArray={[...line]} />
+					))}
 				</Map>
 			</div>
 		</div>

@@ -1,7 +1,7 @@
 const Line = ({
 	mapState: { width, height },
-	coordsArray,
 	latLngToPixel,
+	coordsArray,
 	style = { stroke: "rgb(255,0,0)", strokeWidth: 2 },
 }) => {
 	if (coordsArray.length < 2) {
