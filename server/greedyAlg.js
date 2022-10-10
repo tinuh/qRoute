@@ -19,7 +19,7 @@ function firstMinIndex(arr){
     return index
 }
 
-function greedyAlgorithm(graph, n, maxGap){
+export function greedyAlgorithm(graph, n, maxGap){
 
     let paths = []
     let distances = []
@@ -27,7 +27,7 @@ function greedyAlgorithm(graph, n, maxGap){
     let nextNode = []
     let openNodes = {}
     for (let i = 0; i <  graph.length; i++){
-        openNodes[i] = True
+        openNodes[i] = true
     }
     delete openNodes[0];
     for (let i = 0; i <  n; i++){

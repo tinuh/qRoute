@@ -38,6 +38,7 @@ def closestOpenNode(graph,n,openNodes):
     """
     c = -1
     for i in openNodes:
+        
         if (graph[n][i] < graph[n][c] or c == -1) and i != n:
             c = i
     return c
