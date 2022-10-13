@@ -2,13 +2,11 @@ import React, { useState } from "react";
 import { Map, Marker, Overlay } from "pigeon-maps";
 import axios from "axios";
 //import { stamenToner } from 'pigeon-maps/providers'
-import { greedyAlgorithm } from "../utils/greedyAlg";
+import { greedyAlgorithmCartesian } from "../utils/greedyAlg";
 import Line from "../components/Line";
 
 export default function Home() {
 	const [address, setAddress] = useState("");
-	const [drop, setDrop] = useState(false);
-	const [dropSelection, setDropSelection] = useState("");
 	const [loading, setLoading] = useState(false);
 	const [stops, setStops] = useState([
 		{
@@ -17,6 +15,9 @@ export default function Home() {
 		},
 	]);
 	const [lines, setLines] = useState([]);
+	const [paths, setPaths] = useState([]);
+	const [numRoutes, setRoutes] = useState(2);
+	const [gap, setGap] = useState(2);
 
 	const updateAddress = (e) => {
 		setAddress(e.target.value);
@@ -41,13 +42,8 @@ export default function Home() {
 					coords: [res.data.data[0].latitude, res.data.data[0].longitude],
 				});
 				setStops(temp);
-				// let temp = paths;
-				// temp[0].anchors.push({
-				// 	address: address,
-				// 	coords: [res.data.data[0].latitude, res.data.data[0].longitude],
-				// });
-				// setPaths(temp);
 				setAddress("");
+				doIt();
 			})
 			.catch((error) => {
 				console.log(error);
@@ -59,80 +55,38 @@ export default function Home() {
 		let temp = stops.map(({ coords }) => {
 			return coords;
 		});
-		let res = greedyAlgorithm(temp, 2, 0);
+		let res = greedyAlgorithmCartesian(
+			temp,
+			parseInt(numRoutes),
+			parseInt(gap)
+		);
 		console.log(res);
 		let linesTemp = [];
-		res[0].forEach((path) => {
-			path.forEach((line, i) => {
-				linesTemp.push(stops[path[i]].coords);
+		let pathsTemp = [];
+		res[0].forEach((path, i) => {
+			linesTemp.push([]);
+			pathsTemp.push([]);
+			path.forEach((line) => {
+				linesTemp[i].push(stops[parseInt(line)].coords);
+				pathsTemp[i].push(stops[parseInt(line)].address);
 			});
 		});
 		console.log(linesTemp);
 		setLines(linesTemp);
+		setPaths(pathsTemp);
 	};
 
 	return (
 		<div className="text-center mx-20">
 			<img
 				className="absolute z-50 w-16"
-				src="https://i.gifer.com/origin/5a/5ab33aabd7ff03f9bf4678b91a07afac_w200.gif"
+				src="/bee.gif"
 			/>
 			<img className="h-20 mt-5 m-auto" src="/logo.svg" alt="qroute logo" />
 
 			<div className="my-5 inline-flex gap-4 w-full">
-				<div className="flex-2 inline-flex items-stretch bg-white border-2 border-black rounded-md dark:bg-gray-900 dark:border-gray-800">
-					<a className="m-auto px-4 py-2 text-sm text-black dark:text-gray-300 dark:hover:text-gray-200 dark:hover:bg-gray-800 hover:text-gray-700 hover:bg-gray-50 rounded-l-md">
-						{dropSelection || "Route ID"}
-					</a>
-
-					<div className="relative">
-						<button
-							type="button"
-							onClick={() => setDrop(!drop)}
-							onBlur={() => setDrop(false)}
-							className="inline-flex items-center justify-center h-full px-2 text-black border-l-2 border-black dark:text-gray-300 dark:border-gray-700 dark:hover:text-gray-200 dark:hover:bg-gray-800 hover:text-gray-700 rounded-r-md hover:bg-gray-50"
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								className="w-4 h-4"
-								viewBox="0 0 20 20"
-								fill="currentColor"
-							>
-								<path
-									fillRule="evenodd"
-									d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-									clipRule="evenodd"
-								/>
-							</svg>
-						</button>
-
-						{drop && (
-							<div
-								className="absolute right-0 z-10 w-28 mt-4 bg-white border border-gray-100 shadow-lg origin-top-right dark:bg-gray-900 dark:border-gray-800 rounded-md"
-								role="menu"
-							>
-								<div className="p-2">
-									{paths.map((path, index) => (
-										<a
-											key={index}
-											onClick={() => setDropSelection(path.route)}
-											href="/edit"
-											className="block px-4 py-2 text-sm text-black rounded-lg hover:bg-gray-50 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-gray-800"
-											role="menuitem"
-										>
-											{path.route}
-										</a>
-									))}
-								</div>
-							</div>
-						)}
-					</div>
-				</div>
-
-				<div className="flex-1 relative">
-					<label className="sr-only" htmlFor="name">
-						Address
-					</label>
+				<div className="flex-1 text-left relative">
+					<label className="block text-xs font-medium">Address</label>
 					<input
 						value={address || ""}
 						onChange={updateAddress}
@@ -144,7 +98,7 @@ export default function Home() {
 					/>
 
 					<button
-						className="absolute p-2 text-white bg-black rounded-full -translate-y-1/2 top-1/2 right-4"
+						className="absolute p-2 text-white bg-black rounded-full -translate-y-1/4 top-1/2 right-4"
 						type="button"
 						onClick={add}
 					>
@@ -164,8 +118,28 @@ export default function Home() {
 						</svg>
 					</button>
 				</div>
+				<div className="text-left">
+					<label className="block text-xs font-medium"># of Routes</label>
+					<input
+						type="text"
+						placeholder="# of routes"
+						value={numRoutes}
+						onChange={(e) => setRoutes(e.target.value)}
+						className="pl-3 py-4 w-28 rounded-md border-black border-2 shadow-sm sm:text-sm"
+					/>
+				</div>
+				<div className="text-left">
+					<label className="block text-xs font-medium">Gap</label>
+					<input
+						type="text"
+						placeholder="Gap"
+						value={gap}
+						onChange={(e) => setGap(e.target.value)}
+						className="pl-3 py-4 w-16 rounded-md border-black border-2 shadow-sm sm:text-sm"
+					/>
+				</div>
 				<a
-					className="group relative inline-flex items-center overflow-hidden rounded px-8 py-3 focus:outline-none focus:ring active:bg-yellow-600"
+					className="group mt-4 relative inline-flex items-center overflow-hidden rounded px-8 py-3 focus:outline-none focus:ring active:bg-yellow-600"
 					onClick={() => doIt()}
 					href="#"
 					style={{ backgroundColor: "#ffde59" }}
@@ -193,24 +167,31 @@ export default function Home() {
 				</a>
 			</div>
 
-			{/* {paths.map(({ anchors, route }) => (
-				<div className="text-left" key={route}>
-					<p className="font-bold">{route}</p>
-					<ul className="text-left">
-						{anchors.map((point, key) => (
-							<li key={key}>{point.address}</li>
-						))}
-					</ul>
-				</div>
-			))} */}
+			<div className="flex gap-5">
+				{paths.map((path, i) => (
+					<a
+						key={i}
+						class="relative block rounded-xl border-2 border-black p-5 shadow-xl"
+					>
+						<div class="text-gray-500 text-left sm:pr-8">
+							<h5 class=" text-xl font-bold text-gray-900">Route {i + 1}</h5>
+							<ol>
+								{path.map((stop, i) => (
+									<li>{stop}</li>
+								))}
+							</ol>
+						</div>
+					</a>
+				))}
+			</div>
 
-			<div className="text-left">
+			{/* <div className="text-left">
 				<ul className="text-left">
 					{stops.map(({ address, coords }, i) => (
 						<li key={i}>{address}</li>
 					))}
 				</ul>
-			</div>
+			</div> */}
 
 			<div className="mt-5">
 				<Map
