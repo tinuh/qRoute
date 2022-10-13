@@ -78,10 +78,7 @@ export default function Home() {
 
 	return (
 		<div className="text-center mx-20">
-			<img
-				className="absolute z-50 w-16"
-				src="/bee.gif"
-			/>
+			<img className="absolute z-50 w-16" src="/bee.gif" />
 			<img className="h-20 mt-5 m-auto" src="/logo.svg" alt="qroute logo" />
 
 			<div className="my-5 inline-flex gap-4 w-full">
@@ -176,8 +173,8 @@ export default function Home() {
 						<div class="text-gray-500 text-left sm:pr-8">
 							<h5 class=" text-xl font-bold text-gray-900">Route {i + 1}</h5>
 							<ol>
-								{path.map((stop, i) => (
-									<li>{stop}</li>
+								{path.map((stop, x) => (
+									<li key={x}>{stop}</li>
 								))}
 							</ol>
 						</div>
