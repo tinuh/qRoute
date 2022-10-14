@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Map, Marker, Overlay } from "pigeon-maps";
 import axios from "axios";
-//import { stamenToner } from 'pigeon-maps/providers'
 import { greedyAlgorithmCartesian } from "../utils/greedyAlg";
 import Line from "../components/Line";
+import Radar from "radar-sdk-js";
 
 export default function Home() {
 	const [address, setAddress] = useState("");
@@ -26,29 +26,29 @@ export default function Home() {
 	const add = async () => {
 		if (address === null) return false;
 		await setLoading(true);
-		const axios = require("axios");
 		const params = await {
 			access_key: process.env.NEXT_PUBLIC_POSITION_API_KEY,
 			query: address,
 		};
 
-		await axios
-			.get("http://api.positionstack.com/v1/forward", { params })
-			.then((res) => {
-				console.log(res.data);
+		await Radar.initialize(process.env.NEXT_PUBLIC_RADAR_API_KEY);
+
+		await Radar.geocode({ query: address }, function (err, res) {
+			if (!err) {
+				// do something with result.addresses
+				console.log(res);
 				let temp = stops;
 				temp.push({
 					address: address,
-					coords: [res.data.data[0].latitude, res.data.data[0].longitude],
+					coords: [res.addresses[0].latitude, res.addresses[0].longitude],
 				});
 				setStops(temp);
 				setAddress("");
 				doIt();
-			})
-			.catch((error) => {
-				console.log(error);
-				alert("Error: " + error);
-			});
+			} else {
+				alert(err);
+			}
+		});
 	};
 
 	const doIt = () => {
