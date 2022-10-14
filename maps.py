@@ -1,8 +1,6 @@
 import requests
 import json
 
-API_KEY = 'AIzaSyC1TN-lfpYOcUN_nT2awImBSl7R7iKwhx8'
-
 def closestOpenNode(graph,n,openNodes):
     """
     takes in a graph, starting node, and visited dictionary and finds the closest avalible node to n
