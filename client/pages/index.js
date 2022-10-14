@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Map, Marker, Overlay } from "pigeon-maps";
 import axios from "axios";
-import { greedyAlgorithmCartesian } from "../utils/greedyAlg";
+import { greedyAlgorithm, greedyAlgorithmCartesian } from "../utils/greedyAlg";
+import createDistanceMatrix from "../utils/createDistanceMatrix";
 import Line from "../components/Line";
 import Radar from "radar-sdk-js";
 
@@ -53,13 +54,14 @@ export default function Home() {
 
 	const doIt = () => {
 		let temp = stops.map(({ coords }) => {
-			return coords;
+			return {
+				latitude: coords[0],
+				longitude: coords[1],
+			};
 		});
-		let res = greedyAlgorithmCartesian(
-			temp,
-			parseInt(numRoutes),
-			parseInt(gap)
-		);
+		let matrix = createDistanceMatrix(temp, temp);
+		console.log(matrix);
+		let res = greedyAlgorithm(matrix, parseInt(numRoutes), parseInt(gap));
 		console.log(res);
 		let linesTemp = [];
 		let pathsTemp = [];
