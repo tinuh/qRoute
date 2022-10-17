@@ -59,7 +59,16 @@ function greedyAlgorithmCartesian(coordinates, n, maxGap) {
 		console.log("minLength:", minLength);
 		for (let i = 0; i < n; i++) {
 			if (paths[i].length <= minLength + maxGap) {
-				console.log("adding:", i, " length: ",paths[i].length, " threshold: ",minLength + maxGap,"gap: ",maxGap);
+				console.log(
+					"adding:",
+					i,
+					" length: ",
+					paths[i].length,
+					" threshold: ",
+					minLength + maxGap,
+					"gap: ",
+					maxGap
+				);
 				nextPathDists[i] = nextDistance[i];
 			}
 		}
@@ -109,7 +118,6 @@ function greedyAlgorithm(graph, n, maxGap) {
 	let node = 0;
 	console.log(openNodes);
 	while (Object.keys(openNodes).length > 0) {
-		console.log("hi");
 		let minLength = -1;
 		for (let i = 0; i < n; i++) {
 			if (minLength === -1 || paths[i].length < minLength) {

@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Map, Marker, Overlay } from "pigeon-maps";
 import axios from "axios";
 import { greedyAlgorithm, greedyAlgorithmCartesian } from "../utils/greedyAlg";
-import createDistanceMatrix from "../utils/createDistanceMatrix";
 import Line from "../components/Line";
 import Radar from "radar-sdk-js";
 
@@ -52,30 +51,55 @@ export default function Home() {
 		});
 	};
 
-	const doIt = () => {
+	const doIt = async () => {
 		let temp = stops.map(({ coords }) => {
 			return {
 				latitude: coords[0],
 				longitude: coords[1],
 			};
 		});
-		let matrix = createDistanceMatrix(temp, temp);
-		console.log(matrix);
-		let res = greedyAlgorithm(matrix, parseInt(numRoutes), parseInt(gap));
-		console.log(res);
-		let linesTemp = [];
-		let pathsTemp = [];
-		res[0].forEach((path, i) => {
-			linesTemp.push([]);
-			pathsTemp.push([]);
-			path.forEach((line) => {
-				linesTemp[i].push(stops[parseInt(line)].coords);
-				pathsTemp[i].push(stops[parseInt(line)].address);
-			});
-		});
-		console.log(linesTemp);
-		setLines(linesTemp);
-		setPaths(pathsTemp);
+
+		let matrix = [];
+		await Radar.initialize(process.env.NEXT_PUBLIC_RADAR_API_KEY);
+		await Radar.getMatrix(
+			{
+				origins: temp,
+				destinations: temp,
+				modes: "car",
+				units: "imperial",
+			},
+			function (err, result) {
+				if (!err) {
+					console.log(result.matrix);
+					// do something with result.matrix
+					let radarMatrix = result.matrix;
+					for (let i = 0; i < radarMatrix.length; i++) {
+						matrix.push([]);
+						for (let j = 0; j < radarMatrix[i].length; j++) {
+							matrix[i].push(radarMatrix[i][j].duration.value);
+						}
+					}
+				}
+
+				console.log(matrix);
+				let res = greedyAlgorithm(matrix, numRoutes, gap);
+				console.log(res);
+
+				let linesTemp = [];
+				let pathsTemp = [];
+				res[0].forEach((path, i) => {
+					linesTemp.push([]);
+					pathsTemp.push([]);
+					path.forEach((line) => {
+						linesTemp[i].push(stops[parseInt(line)].coords);
+						pathsTemp[i].push(stops[parseInt(line)].address);
+					});
+				});
+				console.log(linesTemp);
+				setLines(linesTemp);
+				setPaths(pathsTemp);
+			}
+		);
 	};
 
 	return (
