@@ -2,6 +2,8 @@ from networkx import DiGraph
 from vrpy import VehicleRoutingProblem
 import random
 import math
+import copy
+
 
 
 def makeTestGraph(n,m,M):
@@ -314,10 +316,69 @@ def vrpyRouteV1(graph,n,maxGap = 0):
         G.add_edge(i, "Sink", cost=0)
     prob = VehicleRoutingProblem(G)
     prob.num_vehicles = n
-    prob.num_stops = math.ceil(len(graph)/n) + maxGap
+    prob.num_stops = math.ceil(len(graph)/n) + int(maxGap/2)
     prob.solve(greedy = True)
     return prob.best_routes,prob.best_value
 
+global itr
+itr = 0
+
+def updateRoutes(graph,n,maxGap,paths,distances,openNodes,results):
+    global itr
+    itr += 1
+    print(itr,len(openNodes),openNodes)
+    nextNode = [0] * n
+    nextDistance = [0] * n
+    for i in range(n):
+        nextNode[i] = closestOpenNode(graph,paths[i][len(paths[i])-1],openNodes)
+        nextDistance[i] = graph[paths[i][len(paths[i])-1]][nextNode[i]]
+
+    if len(openNodes) > 0:
+        minLength = -1
+
+        for i in range(n):
+            if minLength == -1 or len(paths[i]) < minLength:
+                minLength = len(paths[i])
+        #nextPathDists = {}
+        for i in range(n):
+            if len(paths[i]) <= minLength + maxGap:
+                #nextPathDists[i] = nextDistance[i]
+                routes = copy.deepcopy(paths)
+                dists = copy.deepcopy(distances)
+                last = paths[i][len(paths[i])-1]
+                routes[i].append(nextNode[i])
+                dists[i] += graph[last][nextNode[i]]
+                oNodes = openNodes.copy()
+                del oNodes[nextNode[i]]
+                r = updateRoutes(graph,n,maxGap,routes,dists,oNodes,results)
+                if len(oNodes) == 0:
+                    results.append([r[0],r[1]])
+            
+    return [paths, distances,results]
+
+def recursiveFlexibleTurnPriority(graph,n,maxGap):
+    paths = []
+    distances = []
+    openNodes = {}
+    results = []
+    for i in range(len(graph)):
+        openNodes[i] = True
+    del openNodes[0]
+    for i in range(n):
+        paths.append([0])
+        distances.append(0)
+    output = updateRoutes(graph,n,maxGap,paths,distances,openNodes,results)
+    r = output[2]
+    #print(output)
+    minDist = -1
+    minRouteNum = -1
+    for i in range(len(r)):
+        if minRouteNum == -1 or sum(r[i][1]) < minDist:
+            minDist = sum(r[i][1])
+            print(sum(r[i][1]))
+            minRouteNum = i
+    return r[minRouteNum][0], r[minRouteNum][1]
+    
 
 
 def displayPaths(p,d):
@@ -342,7 +403,7 @@ for i in range(1):
     #p7,d7 = greedyFlexibleTurnPriority(t,routeNum,9)
     #p8,d8 = greedyFlexibleTurnPriority(t,routeNum,15)
     #p9,d9 = greedyFlexibleTurnPriority(t,routeNum,20)
-
+    p10,d10 = recursiveFlexibleTurnPriority(t,routeNum,1)
 
     v1,vd1 = vrpyRouteV1(t,routeNum,1) 
 
@@ -356,13 +417,12 @@ for i in range(1):
     print(vd1)
 
     #dists = [sum(d),sum(d2),sum(d3),sum(d4),sum(d5),sum(d6),sum(d7),sum(d8)]
-    dists = [sum(d5),sum(d6)]
-    paths = [p5,p6]
-    #print(firstMinIndex(dists),dists)
-    #print(min(dists))
+    dists = [sum(d5),sum(d6),sum(d10)]
+    paths = [p5,p6,p10]
+    print(firstMinIndex(dists),dists)
+    print(min(dists))
     bestCount[firstMinIndex(dists)] += 1
     print(bestCount)
     print(paths[firstMinIndex(dists)])
     print(min(dists))
     #print(d)
-    
