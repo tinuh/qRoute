@@ -350,7 +350,9 @@ def updateRoutes(graph,n,maxGap,paths,distances,openNodes,results):
                 dists[i] += graph[last][nextNode[i]]
                 oNodes = openNodes.copy()
                 del oNodes[nextNode[i]]
+                print(oNodes,openNodes)
                 r = updateRoutes(graph,n,maxGap,routes,dists,oNodes,results)
+                print(oNodes,openNodes)
                 if len(oNodes) == 0:
                     results.append([r[0],r[1]])
             
@@ -387,6 +389,9 @@ def displayPaths(p,d):
     print(" ")
 
 bestCount = [0,0,0,0,0,0,0,0]
+
+print(recursiveFlexibleTurnPriority([[0,1,1],[1,0,2],[1,2,0]],2,0))
+
 for i in range(1):
 
     stopCount = int(input("number of stops: "))

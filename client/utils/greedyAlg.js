@@ -156,4 +156,78 @@ function greedyAlgorithm(graph, n, maxGap) {
 	return [paths, distances];
 }
 
-export { greedyAlgorithmCartesian, greedyAlgorithm };
+
+
+function deepCopy(arr){
+	const clone = (items) => items.map(item => Array.isArray(item) ? clone(item) : item);
+	return clone(arr)
+	//credit: Tareq Al-Zubaidi
+}
+
+function updateRoutes(graph,n,maxGap,paths,distances,openNodes,results){
+	let nextNode = Array(n).fill(0)
+	let nextDistance = Array(n).fill(0)
+
+	for (let i = 0; i < n; i++){
+		nextNode[i] = closestOpenNode(graph,paths[i][paths[i].length-1],openNodes)
+		nextDistance[i] = graph[paths[i][paths[i].length-1]][nextNode[i]]
+	}
+
+	if (Object.keys(openNodes).length > 0){
+		let minLength = -1
+
+		for (let i = 0; i < n; i++){
+			if (minLength == -1 || paths[i].length < minLength){
+				minLength = paths[i].length
+			}
+		}
+		for (let i = 0; i < n; i++){
+			if(paths[i].length <= minLength + maxGap){
+				let routes = deepCopy(paths)
+				let dists = deepCopy(distances)
+				let last = paths[i][paths[i].length-1]
+				routes[i].push(nextNode[i])
+				dists[i] += graph[last][nextNode[i]]
+				oNodes = Object.assign({}, openNodes);
+				delete oNodes[nextNode[i]];
+				let r = updateRoutes(graph,n,maxGap,routes,dists,Object.assign({}, oNodes),results)
+				//I don't need to do the below in the python. Checking oNides for length 0 doesn't work for some reason
+				//likely has to do with copying object, but it should just work?
+				if ((Object.keys(openNodes).length == 1)){
+					results.push([r[0],r[1]])
+				}
+			}
+		}
+	}
+	return [paths,distances,results]
+}
+
+function recursiveAlgorithm(graph,n,maxGap){
+	let paths = []
+	let distances = []
+	let openNodes = {}
+	let results = []
+	for(let i = 0; i < graph.length;i++){
+		openNodes[i] = true
+	}
+	delete openNodes[0];
+	for(let i = 0; i < n; i++){
+		paths.push([0])
+		distances.push(0)
+	}
+	let output = updateRoutes(graph,n,maxGap,paths,distances,openNodes,results)
+	let r = output[2]
+	let minDist = -1
+	let minRouteNum = -1
+	for(let i = 0; i < r.length;i++){
+		if(minRouteNum == -1 || r[i][1].reduce((partialSum, a) => partialSum + a, 0) < minDist){
+			minDist = r[i][1].reduce((partialSum, a) => partialSum + a, 0)
+			minRouteNum = i
+		}
+	}
+	return [r[minRouteNum][0],r[minRouteNum][1]]
+}
+
+
+
+export { greedyAlgorithmCartesian, greedyAlgorithm, recursiveAlgorithm };
