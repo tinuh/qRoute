@@ -153,6 +153,8 @@ function greedyAlgorithm(graph, n, maxGap) {
 			}
 		}
 	}
+	console.log("out greed")
+	console.log(paths)
 	return [paths, distances];
 }
 
@@ -165,12 +167,14 @@ function deepCopy(arr){
 }
 
 function updateRoutes(graph,n,maxGap,paths,distances,openNodes,results){
+	console.log("recurse")
 	maxGap = parseInt(maxGap)
 	let nextNode = Array(n).fill(0)
 	let nextDistance = Array(n).fill(0)
 
 	for (let i = 0; i < n; i++){
 		nextNode[i] = closestOpenNode(graph,paths[i][paths[i].length-1],openNodes)
+		console.log(i,paths[i],nextNode[i],openNodes)
 		nextDistance[i] = graph[paths[i][paths[i].length-1]][nextNode[i]]
 	}
 
@@ -184,6 +188,7 @@ function updateRoutes(graph,n,maxGap,paths,distances,openNodes,results){
 		}
 		for (let i = 0; i < n; i++){
 			if(paths[i].length <= minLength + maxGap){
+				/*
 				let routes = deepCopy(paths)
 				let dists = deepCopy(distances)
 				let last = paths[i][paths[i].length-1]
@@ -197,6 +202,24 @@ function updateRoutes(graph,n,maxGap,paths,distances,openNodes,results){
 				if ((Object.keys(openNodes).length == 1)){
 					results.push([r[0],r[1]])
 				}
+				*/
+				Object.keys(openNodes).forEach((j) => {
+					let routes = deepCopy(paths)
+				let dists = deepCopy(distances)
+				let last = paths[i][paths[i].length-1]
+				routes[i].push(j)
+				dists[i] += graph[last][j]
+				let oNodes = Object.assign({}, openNodes);
+				delete oNodes[j];
+				console.log("j")
+				console.log(j)
+				let r = updateRoutes(graph,n,maxGap,routes,dists,Object.assign({}, oNodes),results)
+				//I don't need to do the below in the python. Checking oNides for length 0 doesn't work for some reason
+				//likely has to do with copying object, but it should just work?
+				if ((Object.keys(oNodes).length == 0)){
+					results.push([r[0],r[1]])
+				}
+			});
 			}
 		}
 	}
@@ -221,11 +244,15 @@ function recursiveAlgorithm(graph,n,maxGap){
 	let minDist = -1
 	let minRouteNum = -1
 	for(let i = 0; i < r.length;i++){
+		console.log("route")
+		console.log(r[i][0],r[i][1].reduce((partialSum, a) => partialSum + a, 0))
 		if(minRouteNum == -1 || r[i][1].reduce((partialSum, a) => partialSum + a, 0) < minDist){
 			minDist = r[i][1].reduce((partialSum, a) => partialSum + a, 0)
 			minRouteNum = i
 		}
 	}
+	console.log("out rec")
+	console.log(r[minRouteNum][0])
 	return [r[minRouteNum][0],r[minRouteNum][1]]
 }
 
