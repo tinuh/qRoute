@@ -102,6 +102,12 @@ export default function Home() {
 		);
 	};
 
+	const removeStop = (index) => {
+		let temp = stops;
+		temp.splice(index, 1);
+		setStops(temp);
+		doIt();
+	};
 	return (
 		<div className="text-center mx-20">
 			<img className="absolute z-50 w-16" src="/bee.gif" />
@@ -194,13 +200,23 @@ export default function Home() {
 				{paths.map((path, i) => (
 					<a
 						key={i}
-						class="relative block rounded-xl border-2 border-black p-5 shadow-xl"
+						className="relative block rounded-xl border-2 border-black p-5 shadow-xl"
 					>
-						<div class="text-gray-500 text-left sm:pr-8">
-							<h5 class=" text-xl font-bold text-gray-900">Route {i + 1}</h5>
+						<div className="text-gray-500 text-left sm:pr-8">
+							<h5 className=" text-xl font-bold text-gray-900">
+								Route {i + 1}
+							</h5>
 							<ol>
 								{path.map((stop, x) => (
-									<li key={x}>{stop}</li>
+									<li
+										key={x}
+										className="hover:line-through hover:cursor-pointer hover:text-red-400"
+										onClick={() =>
+											removeStop(stops.findIndex((s) => s.address === stop))
+										}
+									>
+										{stop}
+									</li>
 								))}
 							</ol>
 						</div>
