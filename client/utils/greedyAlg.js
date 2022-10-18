@@ -188,7 +188,7 @@ function updateRoutes(graph,n,maxGap,paths,distances,openNodes,results){
 				let last = paths[i][paths[i].length-1]
 				routes[i].push(nextNode[i])
 				dists[i] += graph[last][nextNode[i]]
-				oNodes = Object.assign({}, openNodes);
+				let oNodes = Object.assign({}, openNodes);
 				delete oNodes[nextNode[i]];
 				let r = updateRoutes(graph,n,maxGap,routes,dists,Object.assign({}, oNodes),results)
 				//I don't need to do the below in the python. Checking oNides for length 0 doesn't work for some reason
