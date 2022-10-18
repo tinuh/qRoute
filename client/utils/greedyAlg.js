@@ -19,7 +19,7 @@ function firstMinIndex(arr) {
 }
 
 function greedyAlgorithmCartesian(coordinates, n, maxGap) {
-	console.log(n, maxGap);
+	maxGap = parseInt(maxGap)
 	let graph = [];
 	for (let i = 0; i < coordinates.length; i++) {
 		graph.push([]);
@@ -56,7 +56,6 @@ function greedyAlgorithmCartesian(coordinates, n, maxGap) {
 			}
 		}
 		let nextPathDists = {};
-		console.log("minLength:", minLength);
 		for (let i = 0; i < n; i++) {
 			if (paths[i].length <= minLength + maxGap) {
 				console.log(
@@ -72,7 +71,7 @@ function greedyAlgorithmCartesian(coordinates, n, maxGap) {
 				nextPathDists[i] = nextDistance[i];
 			}
 		}
-		node = -1;
+		let node = -1;
 		Object.keys(nextPathDists).forEach((i) => {
 			console.log(i, nextPathDists[i]);
 			if (node === -1 || nextPathDists[i] < nextPathDists[node]) {
@@ -100,6 +99,7 @@ function greedyAlgorithmCartesian(coordinates, n, maxGap) {
 }
 
 function greedyAlgorithm(graph, n, maxGap) {
+	maxGap = parseInt(maxGap)
 	let paths = [];
 	let distances = [];
 	let nextDistance = [];
@@ -130,7 +130,7 @@ function greedyAlgorithm(graph, n, maxGap) {
 				nextPathDists[i] = nextDistance[i];
 			}
 		}
-		node = -1;
+		let node = -1;
 		Object.keys(nextPathDists).forEach((i) => {
 			if (node === -1 || nextPathDists[i] < nextPathDists[node]) {
 				node = i;
@@ -165,6 +165,7 @@ function deepCopy(arr){
 }
 
 function updateRoutes(graph,n,maxGap,paths,distances,openNodes,results){
+	maxGap = parseInt(maxGap)
 	let nextNode = Array(n).fill(0)
 	let nextDistance = Array(n).fill(0)
 
