@@ -19,7 +19,7 @@ const Line = ({
 			let pixel2 = latLngToPixel(coordsArray[x][i]);
 			lines.push(
 				<line
-					key={i}
+					key={parseInt(String(x) + String(i))}
 					x1={pixel[0]}
 					y1={pixel[1]}
 					x2={pixel2[0]}
@@ -33,7 +33,7 @@ const Line = ({
 
 	return (
 		<svg width={width} height={height} style={{ top: 0, left: 0 }}>
-			{lines}
+			{lines.map((line) => line)}
 		</svg>
 	);
 };
