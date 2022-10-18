@@ -167,14 +167,12 @@ function deepCopy(arr){
 }
 
 function updateRoutes(graph,n,maxGap,paths,distances,openNodes,results){
-	console.log("recurse")
 	maxGap = parseInt(maxGap)
 	let nextNode = Array(n).fill(0)
 	let nextDistance = Array(n).fill(0)
 
 	for (let i = 0; i < n; i++){
 		nextNode[i] = closestOpenNode(graph,paths[i][paths[i].length-1],openNodes)
-		console.log(i,paths[i],nextNode[i],openNodes)
 		nextDistance[i] = graph[paths[i][paths[i].length-1]][nextNode[i]]
 	}
 
@@ -211,8 +209,7 @@ function updateRoutes(graph,n,maxGap,paths,distances,openNodes,results){
 				dists[i] += graph[last][j]
 				let oNodes = Object.assign({}, openNodes);
 				delete oNodes[j];
-				console.log("j")
-				console.log(j)
+
 				let r = updateRoutes(graph,n,maxGap,routes,dists,Object.assign({}, oNodes),results)
 				//I don't need to do the below in the python. Checking oNides for length 0 doesn't work for some reason
 				//likely has to do with copying object, but it should just work?
